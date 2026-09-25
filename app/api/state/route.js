@@ -35,6 +35,12 @@ export async function POST(req){
       await sql`INSERT INTO clients(id,name,type,site,city) VALUES (${id},${name},${body.type||'Local Business'},${body.site||'Not set'},${body.city||'Not set'})`;
     }
     if(body.kind==='action') await sql`UPDATE seo_actions SET completed=${!!body.completed},updated_at=NOW() WHERE id=${Number(body.id)}`;
+    if(body.kind==='delete_client'){
+      const id=String(body.id||'').trim();
+      if(!id) return NextResponse.json({error:'Client ID is required'},{status:400});
+      const deleted=await sql`DELETE FROM clients WHERE id=${id} RETURNING id,name`;
+      if(!deleted.length) return NextResponse.json({error:'Client not found'},{status:404});
+    }
     return NextResponse.json(await state());
   }catch(e){return NextResponse.json({error:e.message},{status:500})}
 }
