@@ -4,7 +4,7 @@ import {useEffect,useMemo,useState} from 'react';
 export default function Page(){
  const [clients,setClients]=useState([]),[actions,setActions]=useState([]),[googleConfigured,setGoogleConfigured]=useState(false),[view,setView]=useState('Overview'),[active,setActive]=useState(null),[modal,setModal]=useState(false),[loading,setLoading]=useState(true),[error,setError]=useState('');
  const [searchData,setSearchData]=useState(null),[searchLoading,setSearchLoading]=useState(false),[sites,setSites]=useState([]),[siteLoading,setSiteLoading]=useState(false),[days,setDays]=useState(28);
- const [audits,setAudits]=useState([]),[auditLoading,setAuditLoading]=useState(false),[fixIssue,setFixIssue]=useState(null),[fixTasks,setFixTasks]=useState([]),[fixBusy,setFixBusy]=useState(false);
+ const [audits,setAudits]=useState([]),[auditLoading,setAuditLoading]=useState(false),[fixIssue,setFixIssue]=useState(null),[fixTasks,setFixTasks]=useState([]),[fixBusy,setFixBusy]=useState(false),[fixBackups,setFixBackups]=useState([]),[githubFixConfigured,setGithubFixConfigured]=useState(false);
  const apply=d=>{setClients(d.clients||[]);setActions(d.actions||[]);setGoogleConfigured(!!d.googleConfigured)};
  const loadState=()=>fetch('/api/state',{cache:'no-store'}).then(async r=>{const d=await r.json();if(!r.ok)throw new Error(d.error||'Load failed');apply(d);return d});
  useEffect(()=>{loadState().catch(e=>setError(e.message)).finally(()=>setLoading(false))},[]);
