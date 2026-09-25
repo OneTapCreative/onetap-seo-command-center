@@ -1,0 +1,38 @@
+import { NextResponse } from 'next/server';
+import { ensureSchema, getSql } from '../../../lib/db';
+
+export const dynamic='force-dynamic';
+
+async function state(){
+  await ensureSchema();
+  const sql=getSql();
+  const clients=await sql`SELECT id,name,type,site,city FROM clients ORDER BY created_at`;
+  const actions=await sql`SELECT id,title,priority,scope,completed FROM seo_actions ORDER BY id`;
+  return {clients,actions};
+}
+
+export async function GET(){
+  try{return NextResponse.json(await state())}
+  catch(e){return NextResponse.json({error:e.message},{status:500})}
+}
+
+export async function POST(req){
+  try{
+    await ensureSchema();
+    const sql=getSql();
+    const body=await req.json();
+    if(body.kind==='client'){
+      const name=String(body.name||'').trim();
+      if(!name) return NextResponse.json({error:'Business name is required'},{status:400});
+      const base=name.toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'')||'client';
+      let id=base;
+      let n=2;
+      while((await sql`SELECT 1 FROM clients WHERE id=${id}`).length){id=base+'-'+n++}
+      await sql`INSERT INTO clients(id,name,type,site,city) VALUES (${id},${name},${body.type||'Local Business'},${body.site||'Not set'},${body.city||'Not set'})`;
+    }
+    if(body.kind==='action'){
+      await sql`UPDATE seo_actions SET completed=${!!body.completed},updated_at=NOW() WHERE id=${Number(body.id)}`;
+    }
+    return NextResponse.json(await state());
+  }catch(e){return NextResponse.json({error:e.message},{status:500})}
+}
