@@ -7,7 +7,7 @@ export const dynamic='force-dynamic';
 async function state(){
   await ensureSchema();
   const sql=getSql();
-  const clients=await sql`SELECT c.id,c.name,c.type,c.site,c.city,
+  const clients=await sql`SELECT c.id,c.name,c.type,c.site,c.city,c.github_repo,
     (i.google_refresh_token_enc IS NOT NULL) AS gsc_connected,
     i.gsc_site_url
     FROM clients c LEFT JOIN client_integrations i ON i.client_id=c.id
@@ -32,7 +32,7 @@ export async function POST(req){
       const base=name.toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'')||'client';
       let id=base,n=2;
       while((await sql`SELECT 1 FROM clients WHERE id=${id}`).length){id=base+'-'+n++}
-      await sql`INSERT INTO clients(id,name,type,site,city) VALUES (${id},${name},${body.type||'Local Business'},${body.site||'Not set'},${body.city||'Not set'})`;
+      await sql`INSERT INTO clients(id,name,type,site,city,github_repo) VALUES (${id},${name},${body.type||'Local Business'},${body.site||'Not set'},${body.city||'Not set'},${body.github_repo||null})`;
     }
     if(body.kind==='action') await sql`UPDATE seo_actions SET completed=${!!body.completed},updated_at=NOW() WHERE id=${Number(body.id)}`;
     if(body.kind==='delete_client'){
