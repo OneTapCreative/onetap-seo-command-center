@@ -5,6 +5,7 @@
     "start": "next start"
   },
   "dependencies": {
+    "@neondatabase/serverless": "^1.0.2",
     "@next/env": "latest",
     "next": "latest",
     "react": "latest",
