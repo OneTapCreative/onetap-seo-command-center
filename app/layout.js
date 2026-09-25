@@ -1,0 +1,1 @@
+import './style.css'; export const metadata={title:'OneTap SEO Command Center',description:'Private SEO operations dashboard'}; export default function RootLayout({children}){return <html lang="en"><body>{children}</body></html>}
